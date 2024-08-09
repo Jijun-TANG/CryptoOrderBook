@@ -1,0 +1,48 @@
+{
+  "name": "order-book-btcustd",
+  "version": "0.0.1",
+  "description": "An api to expose order-book mid-prices",
+  "main": "app.ts",
+  "devDependencies": {
+    "@eslint/js": "^9.8.0",
+    "@types/big.js": "^6.2.2",
+    "@types/node": "^22.1.0",
+    "@types/ramda": "^0.30.1",
+    "@types/ws": "^8.5.12",
+    "eslint": "^8.17.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.9.0",
+    "jest": "^27.3.1",
+    "jest-watch-master": "^1.0.0",
+    "nodemon": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.1"
+  },
+  "dependencies": {
+    "axios": "^1.7.3",
+    "big.js": "^5.2.2",
+    "npx": "^10.2.2",
+    "ramda": "^0.26.1",
+    "ws": "^7.4.6"
+  },
+  "scripts": {
+    "dev": "nodemon src/app.ts",
+    "test": "jest",
+    "test:unit": "jest unit",
+    "test:int": "jest int",
+    "test:coverage": "jest --coverage",
+    "prepare": "husky install",
+    "start:dev": "ts-node -r tsconfig-paths/register ./src/app.ts",
+    "build": "tsc"
+  },
+  "keywords": [
+    "Typescript",
+    "Node"
+  ],
+  "author": "Jijun TANG",
+  "license": "MIT"
+}
