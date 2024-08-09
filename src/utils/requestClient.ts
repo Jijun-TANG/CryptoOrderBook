@@ -7,11 +7,9 @@ const publicRequest = () => getRequestInstance({
   },
 });
 
-const spotPublicRequest = () => getRequestInstance({
-  baseURL: 'https://api.binance.com',
-  headers: {
-    'content-type': 'application/json',
-  },
+const spotPublicRequest = (baseURL = 'https://api.binance.com', params = { 'content-type': 'application/json',}) => getRequestInstance({
+  baseURL: baseURL,
+  headers: params,
 });
 
 

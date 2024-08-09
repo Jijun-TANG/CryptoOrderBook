@@ -22,11 +22,11 @@ class OrderBook {
     return this._data.symbol;
   }
 
-  getBestBid(): number {
+  getBestBid(): number|string {
     return this._data.bid[0][0];
   }
 
-  getBestAsk(): number {
+  getBestAsk(): number|string {
     return this._data.ask[0][0];
   }
 
@@ -54,16 +54,16 @@ class OrderBook {
 //     }, 4000);
 //   }
 
-//   best_price(symbol = "BTCUSDT") {
-//     setInterval(() => {
-//       if (this._data.ask.length == 0) {
-//         logger.info('waiting for warm up');
-//         return;
-//       }
-//       logger.info(`Best Ask for ${symbol}:`, this.getBestAsk());
-//       logger.info(`Best Bid for ${symbol}:`, this.getBestBid());
-//     }, 1000);
-//   }
+  best_price(symbol = "BTCUSDT") {
+    setInterval(() => {
+      if (this._data.ask.length == 0) {
+        console.info('waiting for warm up');
+        return;
+      }
+      console.info(`Best Ask for ${symbol}:`, this.getBestAsk());
+      console.info(`Best Bid for ${symbol}:`, this.getBestBid());
+    }, 1000);
+  }
 }
 
 export default OrderBook;

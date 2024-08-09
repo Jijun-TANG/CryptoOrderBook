@@ -20,12 +20,13 @@ const processOrderBookSnapshot = (orderBookData, snapshotOrderbook) => {
   ]);
 
   const validateValue = (v) => Big(v[0]);
-  orderBookData.bid = uniqBy(validateValue, [...snapshotOrders[1], ...orderBookData.bid])
+  if(snapshotOrders && snapshotOrders.length > 1){
+    orderBookData.bid = uniqBy(validateValue, [...snapshotOrders[1], ...orderBookData.bid])
     .sort(compareValueFn('bid'), orderBookData.bid);
 
-  orderBookData.ask = uniqBy(validateValue, [...snapshotOrders[0], ...orderBookData.ask])
-    .sort(compareValueFn('ask'), orderBookData.ask);
-
+    orderBookData.ask = uniqBy(validateValue, [...snapshotOrders[0], ...orderBookData.ask])
+      .sort(compareValueFn('ask'), orderBookData.ask);
+  }
 
   return orderBookData;
 };

@@ -8,6 +8,14 @@ export interface orderBookData{
 
 export interface snapShotOrderBookData{
     lastUpdateId: string
-    ask: (number|string)[][],
-    bid: (number|string)[][],
+    asks: (number|string)[][],
+    bids: (number|string)[][],
+};
+
+
+export interface BinanceSocketParameters{
+    U: number,
+    u: string,
+    a: (number|string)[][],
+    b: (number|string)[][],
 };
