@@ -78,3 +78,11 @@ export interface krakenMessageType {
   type: string;
   data: krakenDataType[];
 }
+
+
+export interface HuobiOrderBookData{
+  ch: string;
+  status: string;
+  ts: number;
+  tick: {bids:number[][], asks:number[][], version:number, ts: number}
+}

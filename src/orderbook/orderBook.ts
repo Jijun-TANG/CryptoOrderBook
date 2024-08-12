@@ -4,6 +4,7 @@ import {
   orderBookData,
   snapShotOrderBookData,
 } from "@src/prototypes/data_types";
+import fs from "fs";
 
 class OrderBook {
   _data: orderBookData;
@@ -84,6 +85,9 @@ class OrderBook {
         );
         return;
       }
+      const bestAsk = Number(this.getBestAsk());
+      const bestBid = Number(this.getBestBid());
+
       console.info(
         `Best Ask for ${symbol} of ${dataSource}:`,
         this.getBestAsk()
@@ -92,10 +96,41 @@ class OrderBook {
         `Best Bid for ${symbol} of ${dataSource}:`,
         this.getBestBid()
       );
+      const askData = JSON.stringify(this._data.ask);
+      const bidData = JSON.stringify(this._data.bid);
+      const midPrice = JSON.stringify((bestAsk + bestBid)/2);
 
+
+      if (!fs.existsSync(`./src/price_data/${dataSource}/${symbol}/`)) {
+        fs.mkdirSync(`./src/price_data/${dataSource}/${symbol}/`, { recursive: true });
+        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/ask_data.json`, askData);
+        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/bid_data.json`, bidData);
+        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/mid_price.json`, midPrice);
+      }
+      else{
+        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/ask_data.json`, askData);
+        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/bid_data.json`, bidData);
+        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/mid_price.json`, midPrice);
+      }
+      
+      
+    //   fs.writeFile('../price_data/ask_data.json', askData, { flag: 'w+' }, err => {
+    //       // error checking
+    //       if(err) throw err;
+          
+    //       console.log("Ask data stored");
+    //   });
+
+    //   const bidData = JSON.stringify(this._data.bid);
+    //   fs.writeFile('../price_data/bid_data.json', bidData, { flag: 'w+' }, err => {
+    //     // error checking
+    //     if(err) throw err;
+        
+    //     console.log("Bid data stored");
+    // }); 
       //console.info("Kraken order book bid", this.getBidList(10));
       //console.info("Kraken order book ask", this.getAskList(10));
-    }, 1000);
+    }, 5000);
   }
 }
 

@@ -68,6 +68,7 @@ const UpdateKrakenOrderbookFromWebsocket =
   (message: krakenMessageType) => (orderBook: OrderBook) => {
     var eventTime: number = 0;
     var symbol: string = "default";
+    const currentTime:number = new Date().getTime();
 
     if (message["data"] && message["data"].length > 0) {
       const priceDataLength = message["data"].length;
@@ -88,12 +89,13 @@ const UpdateKrakenOrderbookFromWebsocket =
           eventTime = Number(epoch);
         } else {
           // No valid timestamp provided
-          eventTime = Number(new Date().getTime());
+          eventTime = currentTime;
         }
         if (
           message["data"][k]["bids"] &&
           message["data"][k]["bids"].length > 0
         ) {
+          orderBook._data.bid.filter((arr: (string|number)[]) => currentTime - Number(arr[2]) <= 10);
           message["data"][k]["bids"].forEach(
             (priceObject: { price: number; qty: number }) => {
               orderBook._data.bid.push([
@@ -103,9 +105,10 @@ const UpdateKrakenOrderbookFromWebsocket =
               ]);
             }
           );
+          
           orderBook._data.bid.sort(
             (a: (string | number)[], b: (string | number)[]) => {
-              return Number(b[0]) - Number(a[0]);
+              return Number(a[0]) - Number(b[0]);
             }
           );
           if (orderBook._data.bid.length > 100) {
@@ -116,6 +119,7 @@ const UpdateKrakenOrderbookFromWebsocket =
           message["data"][k]["asks"] &&
           message["data"][k]["asks"].length > 0
         ) {
+          orderBook._data.ask.filter((arr: (string|number)[]) => currentTime - Number(arr[2]) <= 10);
           message["data"][k]["asks"].forEach(
             (priceObject: { price: number; qty: number }) => {
               orderBook._data.ask.push([
@@ -127,7 +131,7 @@ const UpdateKrakenOrderbookFromWebsocket =
           );
           orderBook._data.ask.sort(
             (a: (string | number)[], b: (string | number)[]) => {
-              return Number(a[0]) - Number(b[0]);
+              return Number(b[0]) - Number(a[0]);
             }
           );
           if (orderBook._data.ask.length > 100) {

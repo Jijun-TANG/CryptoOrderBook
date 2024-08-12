@@ -11,7 +11,7 @@ import {
   krakenMessageType,
 } from "./prototypes/data_types";
 import express from "express";
-import asyncHandler from "express-async-handler";
+import { loadHuobiOrderBook } from "./orderbook/loadHuobiData";
 
 const SYMBOL = process.env.SYMBOL || "BTCUSDT";
 const KrakenSymbol = process.env.KrakenSymbol || "BTC/USD";
@@ -19,18 +19,11 @@ const KrakenSymbol = process.env.KrakenSymbol || "BTC/USD";
 const basicKrakenWs = process.env.basicKrakenWs || "wss://ws.kraken.com/";
 const basicBinanceWs =
   process.env.basicBinanceWs || "wss://stream.binance.com/";
-const basicHuobiWs = process.env.basicHuobiWs || "wss://api.huobi.pro/feed";
 
-const basicHuobiAPIURL =
-  process.env.basicHuobiAPIURL || "https://api.huobi.pro/market/";
+
 
 export default async function createApp() {
   logger.info("Start application");
-
-  /*
-  // const socketApi = new SocketClient(`ws/${SYMBOL.toLowerCase()}@depth`, basicKrakenWs);
-  // const orderBook = new OrderBook(SYMBOL.toUpperCase());
-  // socketApi.setHandler('depthUpdate', (params) => orderbookUpdateFromWebsocket(params)(orderBook));*/
 
   // Binance data by web Socket
   const BinanceSocketApi = new SocketClient(
@@ -63,9 +56,6 @@ export default async function createApp() {
     UpdateKrakenOrderbookFromWebsocket(message)(KrakenOrderBook)
   );
 
-  // const socketApi = new SocketClient(`ws/${SYMBOL.toLowerCase()}@depth`, basicKrakenWs);
-  // const orderBook = new OrderBook(SYMBOL.toUpperCase());
-  // socketApi.setHandler('depthUpdate', (params) => orderbookUpdateFromWebsocket(params)(orderBook));
 
   // leave a time gap to wait for websocket connection first
   setTimeout(() => {
@@ -76,11 +66,15 @@ export default async function createApp() {
     // orderbookUpdateFromWebsocket({"channel":"book", "type":"snapshot", "data": [KrakenOrderBook.getOrderbook()]})(KrakenOrderBook);
   }, 3000);
 
-  // inspection
-  //BinanceOrderBook.best_price(SYMBOL);
-  //KrakenOrderBook.best_price(KrakenSymbol, "Kraken");
-  // KrakenOrderBook.inspect();
-  KrakenOrderBook.inspectBitAsk(100);
+  // Calculate best prices and load them into the databases
+  BinanceOrderBook.best_price(SYMBOL);
+  KrakenOrderBook.best_price(KrakenSymbol, "Kraken");
+  setInterval(() => {
+    loadHuobiOrderBook();
+    // load huobi data and store them in the designated json file
+    //onst orderBookData = loadSourceData(basicHuobiAPIURL + `depth?symbol=${symbol.toLowerCase()}&type=${step}`);
+  }, 5000);
+
 
   const app = express();
   app.use(express.json());
@@ -114,6 +108,29 @@ export default async function createApp() {
     }
   });
 
+  
+  // app.get("/huobiOrderBook/:symbol/:step", (req, res,) => {
+  //   const symbol: string = req.params.symbol;
+  //   var stepValue: number = 0;
+  //   try{
+  //     stepValue = parseInt(req.params.step);
+  //   }
+  //   catch(err){
+  //     console.log("Step not correctly specified ", err);
+  //   }
+  //   const step = "step" + stepValue.toString();
+  //   try {
+  //     const orderBookData = loadSourceData(basicHuobiAPIURL + `depth?symbol=${symbol.toLowerCase()}&type=${step}`);
+  //     const { b } = orderBookData;
+  //     const sortedBids = b.sort((a, b) => b[0] - a[0]);
+  //     const bestBid = sortedBids[step - 1][0];
+  //     res.status(200).json({ bestBid });
+  //   } catch (error) {
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // });
+
+
   // exports.getBestBidBinance = asyncHandler(async (req: any, res: any) => {
   //     try{
   //         res.status(200).json(orderBook.ge)
@@ -139,4 +156,4 @@ export default async function createApp() {
   // }
 }
 
-createApp();
+createApp()
