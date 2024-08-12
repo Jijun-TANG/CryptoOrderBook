@@ -41,7 +41,7 @@ export class depthUpdateMessage {
     U: number,
     u: number,
     b: string[][],
-    a: string[][]
+    a: string[][],
   ) {
     this.e = e;
     this.E = E;
@@ -79,10 +79,9 @@ export interface krakenMessageType {
   data: krakenDataType[];
 }
 
-
-export interface HuobiOrderBookData{
+export interface HuobiOrderBookData {
   ch: string;
   status: string;
   ts: number;
-  tick: {bids:number[][], asks:number[][], version:number, ts: number}
+  tick: { bids: number[][]; asks: number[][]; version: number; ts: number };
 }

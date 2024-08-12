@@ -81,7 +81,7 @@ class OrderBook {
     setInterval(() => {
       if (this._data.ask.length == 0) {
         console.info(
-          `waiting for warm up of ${dataSource}\nask: ${this._data.ask}\nbid: ${this._data.bid}`
+          `waiting for warm up of ${dataSource}\nask: ${this._data.ask}\nbid: ${this._data.bid}`,
         );
         return;
       }
@@ -90,46 +90,42 @@ class OrderBook {
 
       console.info(
         `Best Ask for ${symbol} of ${dataSource}:`,
-        this.getBestAsk()
+        this.getBestAsk(),
       );
       console.info(
         `Best Bid for ${symbol} of ${dataSource}:`,
-        this.getBestBid()
+        this.getBestBid(),
       );
-      const askData = JSON.stringify(this._data.ask);
-      const bidData = JSON.stringify(this._data.bid);
-      const midPrice = JSON.stringify((bestAsk + bestBid)/2);
 
+      const midPrice = (bestAsk + bestBid) / 2;
+
+      //Avoid storing wierd currency exchange data like "BTC/USD" that created multiple repositories
+      if (symbol.includes("/")) {
+        symbol = symbol.replaceAll("/", "");
+      }
 
       if (!fs.existsSync(`./src/price_data/${dataSource}/${symbol}/`)) {
-        fs.mkdirSync(`./src/price_data/${dataSource}/${symbol}/`, { recursive: true });
-        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/ask_data.json`, askData);
-        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/bid_data.json`, bidData);
-        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/mid_price.json`, midPrice);
+        fs.mkdirSync(`./src/price_data/${dataSource}/${symbol}/`, {
+          recursive: true,
+        });
+        fs.writeFileSync(
+          `./src/price_data/${dataSource}/${symbol}/orderbook_data.json`,
+          JSON.stringify(this.getOrderbook()),
+        );
+        fs.writeFileSync(
+          `./src/price_data/${dataSource}/${symbol}/mid_price.json`,
+          JSON.stringify([bestBid, bestAsk, midPrice]),
+        );
+      } else {
+        fs.writeFileSync(
+          `./src/price_data/${dataSource}/${symbol}/orderbook_data.json`,
+          JSON.stringify(this.getOrderbook()),
+        );
+        fs.writeFileSync(
+          `./src/price_data/${dataSource}/${symbol}/mid_price.json`,
+          JSON.stringify([bestBid, bestAsk, midPrice]),
+        );
       }
-      else{
-        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/ask_data.json`, askData);
-        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/bid_data.json`, bidData);
-        fs.writeFileSync(`./src/price_data/${dataSource}/${symbol}/mid_price.json`, midPrice);
-      }
-      
-      
-    //   fs.writeFile('../price_data/ask_data.json', askData, { flag: 'w+' }, err => {
-    //       // error checking
-    //       if(err) throw err;
-          
-    //       console.log("Ask data stored");
-    //   });
-
-    //   const bidData = JSON.stringify(this._data.bid);
-    //   fs.writeFile('../price_data/bid_data.json', bidData, { flag: 'w+' }, err => {
-    //     // error checking
-    //     if(err) throw err;
-        
-    //     console.log("Bid data stored");
-    // }); 
-      //console.info("Kraken order book bid", this.getBidList(10));
-      //console.info("Kraken order book ask", this.getAskList(10));
     }, 5000);
   }
 }

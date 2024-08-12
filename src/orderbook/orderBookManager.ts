@@ -16,11 +16,12 @@ const orderBookUpdateFromRESTfulAPI = (
   orderBook: OrderBook,
   defaultURL: string = "/api/v1/depth?limit=100&symbol=",
   baseURL: string = "https://api.binance.com",
-  params = { "content-type": "application/json" }
+  params = { "content-type": "application/json" },
 ) => {
   // Update orderbook from restful api
   getOrderBookSnapshot(orderBook.getSymbol(), defaultURL, baseURL, params).then(
-    (data: snapShotOrderBookData) => orderBook.updateOrderBookWithSnapshot(data)
+    (data: snapShotOrderBookData) =>
+      orderBook.updateOrderBookWithSnapshot(data),
   );
 };
 
@@ -28,7 +29,7 @@ const validateEventUpdateId = (id: number) => (orderBook: OrderBook) => {
   const lastUpdateId = orderBook.getOrderbook().lastUpdateId;
   if (id - Number(lastUpdateId) !== 1 && !orderBook.justInitialized()) {
     throw new DataLostException(
-      `Event id is not continued, lastUpdateId: ${lastUpdateId}, Event Id: ${id}`
+      `Event id is not continued, lastUpdateId: ${lastUpdateId}, Event Id: ${id}`,
     );
   }
 };
@@ -68,7 +69,7 @@ const UpdateKrakenOrderbookFromWebsocket =
   (message: krakenMessageType) => (orderBook: OrderBook) => {
     var eventTime: number = 0;
     var symbol: string = "default";
-    const currentTime:number = new Date().getTime();
+    const currentTime: number = new Date().getTime();
 
     if (message["data"] && message["data"].length > 0) {
       const priceDataLength = message["data"].length;
@@ -95,7 +96,9 @@ const UpdateKrakenOrderbookFromWebsocket =
           message["data"][k]["bids"] &&
           message["data"][k]["bids"].length > 0
         ) {
-          orderBook._data.bid.filter((arr: (string|number)[]) => currentTime - Number(arr[2]) <= 10);
+          orderBook._data.bid.filter(
+            (arr: (string | number)[]) => currentTime - Number(arr[2]) <= 10,
+          );
           message["data"][k]["bids"].forEach(
             (priceObject: { price: number; qty: number }) => {
               orderBook._data.bid.push([
@@ -103,13 +106,13 @@ const UpdateKrakenOrderbookFromWebsocket =
                 priceObject["qty"],
                 eventTime,
               ]);
-            }
+            },
           );
-          
+
           orderBook._data.bid.sort(
             (a: (string | number)[], b: (string | number)[]) => {
               return Number(a[0]) - Number(b[0]);
-            }
+            },
           );
           if (orderBook._data.bid.length > 100) {
             orderBook._data.bid = orderBook._data.bid.slice(0, 100);
@@ -119,7 +122,9 @@ const UpdateKrakenOrderbookFromWebsocket =
           message["data"][k]["asks"] &&
           message["data"][k]["asks"].length > 0
         ) {
-          orderBook._data.ask.filter((arr: (string|number)[]) => currentTime - Number(arr[2]) <= 10);
+          orderBook._data.ask.filter(
+            (arr: (string | number)[]) => currentTime - Number(arr[2]) <= 10,
+          );
           message["data"][k]["asks"].forEach(
             (priceObject: { price: number; qty: number }) => {
               orderBook._data.ask.push([
@@ -127,12 +132,12 @@ const UpdateKrakenOrderbookFromWebsocket =
                 priceObject["qty"],
                 eventTime,
               ]);
-            }
+            },
           );
           orderBook._data.ask.sort(
             (a: (string | number)[], b: (string | number)[]) => {
               return Number(b[0]) - Number(a[0]);
-            }
+            },
           );
           if (orderBook._data.ask.length > 100) {
             orderBook._data.ask = orderBook._data.ask.slice(0, 100);

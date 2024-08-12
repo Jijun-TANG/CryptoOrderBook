@@ -1,8 +1,6 @@
-import Big from 'big.js';
-import {
-  uniqBy, filter, cond, equals, sort,
-} from 'ramda';
-import appendUpdatedId from './appendUpdatedId';
+import Big from "big.js";
+import { uniqBy, filter, cond, equals, sort } from "ramda";
+import appendUpdatedId from "./appendUpdatedId";
 
 const processOrderBookSnapshot = (orderBookData, snapshotOrderbook) => {
   const { lastUpdateId, bids, asks } = snapshotOrderbook;
@@ -15,17 +13,21 @@ const processOrderBookSnapshot = (orderBookData, snapshotOrderbook) => {
   // append the updateId into snapshotOrderbook
   const snapshotOrders = appendUpdatedId(lastUpdateId, asks, bids);
   const compareValueFn = cond([
-    [equals('ask'), () => (a, b) => (new Big(a[0])).minus(b[0])],
-    [equals('bid'), () => (a, b) => (new Big(b[0])).minus(a[0])],
+    [equals("ask"), () => (a, b) => new Big(a[0]).minus(b[0])],
+    [equals("bid"), () => (a, b) => new Big(b[0]).minus(a[0])],
   ]);
 
   const validateValue = (v) => Big(v[0]);
-  if(snapshotOrders && snapshotOrders.length > 1){
-    orderBookData.bid = uniqBy(validateValue, [...snapshotOrders[1], ...orderBookData.bid])
-    .sort(compareValueFn('bid'), orderBookData.bid);
+  if (snapshotOrders && snapshotOrders.length > 1) {
+    orderBookData.bid = uniqBy(validateValue, [
+      ...snapshotOrders[1],
+      ...orderBookData.bid,
+    ]).sort(compareValueFn("bid"), orderBookData.bid);
 
-    orderBookData.ask = uniqBy(validateValue, [...snapshotOrders[0], ...orderBookData.ask])
-      .sort(compareValueFn('ask'), orderBookData.ask);
+    orderBookData.ask = uniqBy(validateValue, [
+      ...snapshotOrders[0],
+      ...orderBookData.ask,
+    ]).sort(compareValueFn("ask"), orderBookData.ask);
   }
 
   return orderBookData;
